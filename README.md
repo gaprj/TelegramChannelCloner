@@ -159,7 +159,7 @@ TelegramChannelCloner/
 # Ubuntu: sudo apt install ffmpeg
 ```
 
-**Ban definitivo →** Use secondary accounts, wait 24h.
+**Perma-Ban →** Use secondary accounts, wait 24h.
 
 ## 📈 Screenshots
 
