@@ -163,5 +163,9 @@ TelegramChannelCloner/
 
 ## 📈 Screenshots
 
-![Dashboard](https://i.imgur.com/screenshot1.png)
+![Dashboard](assets/console.png)
+
+## 🤝 Credits
+
+- Special thanks to [painor for the original FastTelethon snippet](https://gist.github.com/painor/7e74de80ae0c819d3e9abcf9989a8dd6), which provides the core parallel chunking logic that makes the extreme download and upload speeds of this bot possible.
 
