@@ -1,0 +1,5 @@
+Telethon
+cryptg
+hachoir
+qrcode
+flask

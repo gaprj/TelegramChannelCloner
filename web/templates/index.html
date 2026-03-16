@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloner Dashboard</title>
+<style>
+    :root {
+        --bg-color: #0f172a;
+        --card-bg: rgba(30, 41, 59, 0.7);
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --accent: #38bdf8;
+        --accent-glow: rgba(56, 189, 248, 0.4);
+        --danger: #ef4444;
+    }
+    body {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background: var(--bg-color);
+        background-image: radial-gradient(circle at top right, #1e293b, transparent 40%), radial-gradient(circle at bottom left, #0f172a, transparent 40%);
+        color: var(--text-main);
+        margin: 0; padding: 30px 15px;
+        min-height: 100vh;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    h1 { font-weight: 700; font-size: 26px; margin: 0; letter-spacing: 0.5px; text-shadow: 0 0 10px rgba(255,255,255,0.1); }
+    
+    .btn-stop {
+        background-color: transparent; border: 2px solid var(--danger); color: var(--danger);
+        padding: 10px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;
+        transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .btn-stop:hover { background-color: var(--danger); color: white; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    
+    .card {
+        background: var(--card-bg); border-radius: 16px; padding: 20px;
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        transition: transform 0.2s ease;
+    }
+    .card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.1); }
+    
+    .label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .value { font-size: 26px; font-weight: 700; color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
+    .sub-value { font-size: 14px; color: var(--text-muted); margin-top: 5px; font-weight: 500; }
+    
+    .progress-section { margin-bottom: 30px; }
+    .progress-card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
+    
+    .progress-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-family: monospace; }
+    .progress-bar-bg { width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: width 0.3s ease; }
+    
+    .terminal-card { background: #000000; border-radius: 12px; border: 1px solid #333; padding: 15px; }
+    .log-box { font-family: Consolas, Monaco, monospace; font-size: 13px; color: #34d399; height: 400px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; }
+    .log-box::-webkit-scrollbar { width: 8px; }
+    .log-box::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
+    .log-box::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Cloner Dashboard</h1>
+        <button class="btn-stop" onclick="requestStop()">Emergency Stop</button>
+    </div>
+    
+    <div class="grid">
+        <div class="card">
+            <div class="label">Messages Scanned</div>
+            <div class="value" id="msgs">0 / 0</div>
+            <div class="sub-value" id="files">Files Processed: 0</div>
+        </div>
+        <div class="card">
+            <div class="label">Uptime</div>
+            <div class="value" id="uptime">0h 0m 0s</div>
+            <div class="sub-value">System Active</div>
+        </div>
+        <div class="card">
+            <div class="label">Total Downloaded</div>
+            <div class="value" id="tot_dl">0.00 GB</div>
+            <div class="sub-value" id="avg_dl">0.00 MB/s avg</div>
+        </div>
+        <div class="card">
+            <div class="label">Total Uploaded</div>
+            <div class="value" id="tot_ul">0.00 GB</div>
+            <div class="sub-value" id="avg_ul">0.00 MB/s avg</div>
+        </div>
+    </div>
+
+    <div class="progress-section">
+        <div class="progress-card">
+            <div class="label">Download Stream</div>
+            <div class="progress-header" id="dl-text">Waiting for data...</div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="dl-bar"></div></div>
+        </div>
+        <div class="progress-card">
+            <div class="label">Upload Stream</div>
+            <div class="progress-header" id="up-text">Waiting for data...</div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="up-bar"></div></div>
+        </div>
+    </div>
+
+    <div class="terminal-card">
+        <div class="label" style="color: #666;">System Terminal</div>
+        <div class="log-box" id="sys-logs">Initializing core engine...</div>
+    </div>
+</div>
+
+<script>
+    const logBox = document.getElementById('sys-logs');
+    
+    async function requestStop() {
+        const pin = prompt("Enter Security PIN to stop the bot:");
+        if (!pin) return;
+        try {
+            const res = await fetch('/api/stop', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin: pin })
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+                alert("Stop command accepted. Purging queues safely...");
+            } else {
+                alert("Access Denied: " + data.message);
+            }
+        } catch (e) {
+            alert("Connection error.");
+        }
+    }
+
+    function extractPercentage(text) {
+        const match = text.match(/(\d+)%/);
+        return match ? parseInt(match[1]) : 0;
+    }
+
+    setInterval(async () => {
+        try {
+            const r = await fetch('/api/status');
+            const d = await r.json();
+            if(d.error) return;
+            
+            document.getElementById('msgs').innerText = d.msg_scanned + " / " + d.msg_total;
+            document.getElementById('files').innerText = "Files Processed: " + d.files_processed;
+            document.getElementById('uptime').innerText = d.uptime;
+            
+            document.getElementById('tot_dl').innerText = d.tot_dl_gb;
+            document.getElementById('avg_dl').innerText = d.avg_dl + " avg";
+            
+            document.getElementById('tot_ul').innerText = d.tot_ul_gb;
+            document.getElementById('avg_ul').innerText = d.avg_ul + " avg";
+            
+            document.getElementById('dl-text').innerText = d.dl_progress;
+            document.getElementById('up-text').innerText = d.up_progress;
+            
+            document.getElementById('dl-bar').style.width = extractPercentage(d.dl_progress) + "%";
+            document.getElementById('up-bar').style.width = extractPercentage(d.up_progress) + "%";
+            
+            if (d.logs && d.logs.length > 0) {
+                const isScrolledToBottom = logBox.scrollHeight - logBox.clientHeight <= logBox.scrollTop + 10;
+                const processedLogs = d.logs.map(l => l.startsWith('!P!') ? l.substring(3) : l);
+                const newText = processedLogs.join('\n');
+                
+                if (logBox.innerText !== newText) {
+                    logBox.innerText = newText;
+                    if (isScrolledToBottom) {
+                        logBox.scrollTop = logBox.scrollHeight;
+                    }
+                }
+            }
+        } catch(e) {}
+    }, 1000);
+</script>
+</body>
+</html>

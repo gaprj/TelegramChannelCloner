@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+config.ini
+*.session
+*.session-journal
+progress.txt
+tracker.json
+stats.txt
+errori.txt
+debug.txt
+media/
