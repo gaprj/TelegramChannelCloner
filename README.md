@@ -165,6 +165,11 @@ TelegramChannelCloner/
 
 ![Dashboard](assets/console.png)
 
+## 📝 Technical Notes & Performance
+
+Read the operational notes, hardware recommendations, and stress-test benchmarks here:
+[Telegraph: Technical Notes & Observations](https://telegra.ph/Telegram-Channel-Cloner-Technical-Notes--Observations-03-16)
+
 ## 🤝 Credits
 
 - Special thanks to [painor for the original FastTelethon snippet](https://gist.github.com/painor/7e74de80ae0c819d3e9abcf9989a8dd6), which provides the core parallel chunking logic that makes the extreme download and upload speeds of this bot possible.
